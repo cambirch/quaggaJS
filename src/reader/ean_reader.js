@@ -18,11 +18,13 @@ function getDefaulConfig() {
 var properties = {
     CODE_L_START: {value: 0},
     CODE_G_START: {value: 10},
+    CODE_R_START: {value: 20},
     START_PATTERN: {value: [1, 1, 1]},
     STOP_PATTERN: {value: [1, 1, 1]},
     MIDDLE_PATTERN: {value: [1, 1, 1, 1, 1]},
     EXTENSION_START_PATTERN: {value: [1, 1, 2]},
     CODE_PATTERN: {value: [
+        // L Pattern
         [3, 2, 1, 1],
         [2, 2, 2, 1],
         [2, 1, 2, 2],
@@ -33,6 +35,7 @@ var properties = {
         [1, 3, 1, 2],
         [1, 2, 1, 3],
         [3, 1, 1, 2],
+        // G Pattern
         [1, 1, 2, 3],
         [1, 2, 2, 2],
         [2, 2, 1, 2],
@@ -42,7 +45,18 @@ var properties = {
         [4, 1, 1, 1],
         [2, 1, 3, 1],
         [3, 1, 2, 1],
-        [2, 1, 1, 3]
+        [2, 1, 1, 3],
+        // R Pattern
+        [3, 2, 1, 1],
+        [2, 2, 2, 1],
+        [2, 1, 2, 2],
+        [1, 4, 1, 1],
+        [1, 1, 3, 2],
+        [1, 2, 3, 1],
+        [1, 1, 1, 4],
+        [1, 3, 1, 2],
+        [1, 2, 1, 3],
+        [3, 1, 1, 2],
     ]},
     CODE_FREQUENCY: {value: [0, 11, 13, 14, 19, 25, 28, 21, 22, 26]},
     SINGLE_CODE_ERROR: {value: 0.70},
@@ -260,7 +274,7 @@ EANReader.prototype._decodePayload = function(code, result, decodedCodes) {
     decodedCodes.push(code);
 
     for ( i = 0; i < 6; i++) {
-        code = self._decodeCode(code.end, self.CODE_G_START);
+        code = self._decodeCode(code.end, self.CODE_R_START);
         if (!code) {
             return null;
         }
