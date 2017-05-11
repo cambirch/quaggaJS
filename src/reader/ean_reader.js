@@ -211,8 +211,9 @@ EANReader.prototype._findStart = function() {
 EANReader.prototype._verifyTrailingWhitespace = function(endInfo) {
     var self = this,
         trailingWhitespaceEnd;
-
-    trailingWhitespaceEnd = endInfo.end + (endInfo.end - endInfo.start);
+    
+    // The final character of an EAN is only 3 bits, a proper quiet space is 7 bits
+    trailingWhitespaceEnd = endInfo.end + (endInfo.end - endInfo.start) * (7/3);
     if (trailingWhitespaceEnd < self._row.length) {
         if (self._matchRange(endInfo.end, trailingWhitespaceEnd, 0)) {
             return endInfo;
@@ -335,6 +336,11 @@ EANReader.prototype._decode = function() {
         resultInfo = {
             supplement: ext,
             code: result.join("") + ext.code
+        }
+    } else {
+        // Verify the quiet space after an ean
+        if(!self._verifyTrailingWhitespace(code)) {
+            return null;
         }
     }
 
