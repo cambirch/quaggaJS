@@ -16,7 +16,7 @@ EAN8Reader.prototype._decodePayload = function(code, result, decodedCodes) {
         self = this;
 
     for ( i = 0; i < 4; i++) {
-        code = self._decodeCode(code.end, self.CODE_G_START);
+        code = self._decodeCode(code.end, self.CODE_L_START);
         if (!code) {
             return null;
         }
@@ -31,7 +31,7 @@ EAN8Reader.prototype._decodePayload = function(code, result, decodedCodes) {
     decodedCodes.push(code);
 
     for ( i = 0; i < 4; i++) {
-        code = self._decodeCode(code.end, self.CODE_G_START);
+        code = self._decodeCode(code.end, self.CODE_R_START);
         if (!code) {
             return null;
         }
