@@ -5,7 +5,8 @@ function EAN8Reader(opts, supplements) {
 }
 
 var properties = {
-    FORMAT: {value: "ean_8", writeable: false}
+    FORMAT: {value: "ean_8", writeable: false},
+    QUIET_ZONE_START: { value: 7 },
 };
 
 EAN8Reader.prototype = Object.create(EANReader.prototype, properties);
@@ -20,6 +21,7 @@ EAN8Reader.prototype._decodePayload = function(code, result, decodedCodes) {
         if (!code) {
             return null;
         }
+        if (code.code > 9) return null;
         result.push(code.code);
         decodedCodes.push(code);
     }
@@ -35,6 +37,7 @@ EAN8Reader.prototype._decodePayload = function(code, result, decodedCodes) {
         if (!code) {
             return null;
         }
+        if (code.code > 9) return null;
         decodedCodes.push(code);
         result.push(code.code);
     }

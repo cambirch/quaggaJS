@@ -61,7 +61,11 @@ var properties = {
     CODE_FREQUENCY: {value: [0, 11, 13, 14, 19, 25, 28, 21, 22, 26]},
     SINGLE_CODE_ERROR: {value: 0.70},
     AVG_CODE_ERROR: {value: 0.48},
-    FORMAT: {value: "ean_13", writeable: false}
+    FORMAT: {value: "ean_13", writeable: false},
+    QUIET_ZONE_START: { value: 11 },
+    QUIET_ZONE_STOP: { value: 7 },
+    START_PATTERN_SIZE: { value: 3 },
+    STOP_PATTERN_SIZE: { value: 3 },
 };
 
 EANReader.prototype = Object.create(BarcodeReader.prototype, properties);
@@ -197,7 +201,8 @@ EANReader.prototype._findStart = function() {
         if (!startInfo) {
             return null;
         }
-        leadingWhitespaceStart = startInfo.start - (startInfo.end - startInfo.start);
+        // start is 3 bits, * QUIET_ZONE_START / START_PATTERN_SIZE
+        leadingWhitespaceStart = startInfo.start - ((startInfo.end - startInfo.start) * self.QUIET_ZONE_START / self.START_PATTERN_SIZE);
         if (leadingWhitespaceStart >= 0) {
             if (self._matchRange(leadingWhitespaceStart, startInfo.start, 0)) {
                 return startInfo;
@@ -213,7 +218,7 @@ EANReader.prototype._verifyTrailingWhitespace = function(endInfo) {
         trailingWhitespaceEnd;
     
     // The final character of an EAN is only 3 bits, a proper quiet space is 7 bits
-    trailingWhitespaceEnd = endInfo.end + (endInfo.end - endInfo.start) * (7/3);
+    trailingWhitespaceEnd = endInfo.end + (endInfo.end - endInfo.start) * (self.QUIET_ZONE_STOP / self.STOP_PATTERN_SIZE);
     if (trailingWhitespaceEnd < self._row.length) {
         if (self._matchRange(endInfo.end, trailingWhitespaceEnd, 0)) {
             return endInfo;
@@ -252,6 +257,9 @@ EANReader.prototype._decodePayload = function(code, result, decodedCodes) {
         if (!code) {
             return null;
         }
+        // The code is allowed to be 0-19, but not an R pattern
+        if (code.code > 19) return null;
+
         if (code.code >= self.CODE_G_START) {
             code.code = code.code - self.CODE_G_START;
             codeFrequency |= 1 << (5 - i);
@@ -279,6 +287,7 @@ EANReader.prototype._decodePayload = function(code, result, decodedCodes) {
         if (!code) {
             return null;
         }
+        if (code.code > 9) return null;
         decodedCodes.push(code);
         result.push(code.code);
     }
